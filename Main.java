@@ -172,9 +172,9 @@ class TabelaHashAutossabotada<Chave, Valor> {
 public class Main {
 
     public static void main(String[] args) {
-        // gerarArquivoResultados();
+        gerarArquivoResultados();
 
-        run();
+        // run();
 
     }
 
@@ -250,16 +250,10 @@ public class Main {
                 System.out.println("  Processando para n = " + n + "...");
 
                 // Executa o teste para a tabela com custo Θ(log n)
-                LocalDateTime inicio = LocalDateTime.now();
-                executarTesteHash(n, numeroDeOperacoesPorN, true);
-                LocalDateTime fim = LocalDateTime.now();
-                long tempoLogN = Duration.between(inicio, fim).toMillis();
 
-                // Executa o teste para a tabela de controle com custo Θ(1)
-                LocalDateTime inicio1 = LocalDateTime.now();
-                executarTesteHash(n, numeroDeOperacoesPorN, false);
-                LocalDateTime fim1 = LocalDateTime.now();
-                long tempoConstante = Duration.between(inicio1, fim1).toMillis();
+                long tempoLogN = executarTesteHash(n, numeroDeOperacoesPorN, true);
+
+                long tempoConstante = executarTesteHash(n, numeroDeOperacoesPorN, false);
 
                 // Monta e escreve a linha de resultado no arquivo CSV
                 String linhaResultado = String.format("%d,%d,%d", n, tempoLogN, tempoConstante);
@@ -271,7 +265,7 @@ public class Main {
 
     }
 
-    private static void executarTesteHash(int n, int operacoesMultiplier, boolean adicionaCusto) {
+    private static long executarTesteHash(int n, int operacoesMultiplier, boolean adicionaCusto) {
         TabelaHashAutossabotada<String, String> tabela = new TabelaHashAutossabotada<>();
         int totalOperacoes = n * operacoesMultiplier;
 
@@ -283,6 +277,16 @@ public class Main {
             String chave = UUID.randomUUID().toString();
             tabela.insert(chave, "valor_novo", adicionaCusto);
         }
+        LocalDateTime inicio1 = LocalDateTime.now();
+        for (int i = 0; i < totalOperacoes; i++) {
+            String chave = UUID.randomUUID().toString();
+            tabela.insert(chave, "valor_novo", adicionaCusto);
+        }
+        LocalDateTime fim1 = LocalDateTime.now();
+        long duracaoTotal = Duration.between(inicio1, fim1).toMillis();
+
+        // Retorna o tempo MÉDIO por operação
+        return duracaoTotal / totalOperacoes;
 
     }
 }
